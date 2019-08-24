@@ -22,6 +22,7 @@ import android.content.Context.CLIPBOARD_SERVICE
 import android.text.ClipboardManager
 import android.view.View
 import androidx.core.content.ContextCompat.getSystemService
+import com.unsplash.pickerandroid.photopicker.data.UnsplashPhoto
 import com.unsplash.pickerandroid.photopicker.presentation.UnsplashPickerActivity
 
 
@@ -29,6 +30,7 @@ class MainActivity : AppCompatActivity() {
 
     val RC_UNSPLASH_IMAGES = 1023
     private var currentUrl: String? = null
+    private var thumnailUrl: String? = null
     lateinit var bi: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,7 +67,11 @@ class MainActivity : AppCompatActivity() {
             var str = it
             str = str.replace("https://", "//")
             str = str.replace("http://", "//")
-            var template = "{{< image classes=\"clear fancybox  fig-100\" src=\"$str\" thumbnail=\"$str\" title=\"\" >}}"
+
+            thumnailUrl = thumnailUrl?.replace("https://", "//") ?: str
+            thumnailUrl = thumnailUrl?.replace("http://", "//") ?: str
+
+            var template = "{{< image classes=\"clear fancybox  fig-100\" src=\"$str\" thumbnail=\"$thumnailUrl\" title=\"\" >}}"
 
             val cm = applicationContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             cm.text = template
@@ -86,6 +92,7 @@ class MainActivity : AppCompatActivity() {
 
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == Config.RC_PICK_IMAGES && resultCode == Activity.RESULT_OK && data != null)
         {
             val images = data.getParcelableArrayListExtra<Image>(Config.EXTRA_IMAGES)
@@ -100,6 +107,7 @@ class MainActivity : AppCompatActivity() {
                     bi.imgPreview.visibility = View.VISIBLE
 
                     currentUrl = resultData["url"] as String
+                    thumnailUrl = currentUrl
                     Glide.with(this@MainActivity).load(currentUrl).into(bi.imgPreview)
                 }
                 onErrorCallback { requestId, error ->
@@ -107,13 +115,25 @@ class MainActivity : AppCompatActivity() {
                     bi.progress.visibility = View.GONE
                     bi.imgPreview.visibility = View.VISIBLE
 
+                    currentUrl = null
+                    thumnailUrl = null
+
                     Toast.makeText(this@MainActivity, error?.description, Toast.LENGTH_LONG).show()
                 }
             })
         }
-        else if (requestCode == RC_UNSPLASH_IMAGES)
+        else if (requestCode == RC_UNSPLASH_IMAGES && resultCode == Activity.RESULT_OK)
         {
+            val photos: ArrayList<UnsplashPhoto>? = data?.getParcelableArrayListExtra(UnsplashPickerActivity.EXTRA_PHOTOS)
+            photos?.let {
 
+                bi.progress.visibility = View.GONE
+                bi.imgPreview.visibility = View.VISIBLE
+
+                currentUrl = it[0].urls.regular
+                thumnailUrl = it[0].urls.thumb
+                Glide.with(this@MainActivity).load(currentUrl).into(bi.imgPreview)
+            }
         }
     }
 }
