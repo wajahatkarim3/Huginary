@@ -53,6 +53,8 @@ class MainActivity : AppCompatActivity() {
             str = str.replace("http://", "//")
             val cm = applicationContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             cm.text = str
+
+            Toast.makeText(this@MainActivity, "Copied to Clipboard.", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -66,6 +68,8 @@ class MainActivity : AppCompatActivity() {
 
             val cm = applicationContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             cm.text = template
+
+            Toast.makeText(this@MainActivity, "Copied to Clipboard.", Toast.LENGTH_SHORT).show()
         }
     }
 
