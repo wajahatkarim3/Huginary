@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Huginary</string>
+    <string name="markdown_image_str">![](%s)</string>
 </resources>

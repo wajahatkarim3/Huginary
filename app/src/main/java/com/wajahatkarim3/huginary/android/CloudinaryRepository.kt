@@ -31,4 +31,16 @@ object CloudinaryRepository
 
         return request.dispatch(HuginaryApp.instance.applicationContext)
     }
+
+    fun uploadImageCallback(filePath: String, callback: CloudinaryUploadCallback)
+    {
+        var request = MediaManager.get().upload(filePath)
+            .unsigned("huginary")
+            .constrain(TimeWindow.getDefault())
+            .option("resource_type", "auto")
+            .maxFileSize(10 * 1024 * 1024)
+            .policy(MediaManager.get().globalUploadPolicy.newBuilder().maxRetries(2).build())
+
+        request.callback(callback).dispatch(HuginaryApp.instance.applicationContext)
+    }
 }
