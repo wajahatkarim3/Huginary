@@ -31,6 +31,7 @@ class MainActivity : AppCompatActivity() {
     val RC_UNSPLASH_IMAGES = 1023
     private var currentUrl: String? = null
     private var thumnailUrl: String? = null
+    private var unsplashCaption: String? = null
     lateinit var bi: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,7 +72,9 @@ class MainActivity : AppCompatActivity() {
             thumnailUrl = thumnailUrl?.replace("https://", "//") ?: str
             thumnailUrl = thumnailUrl?.replace("http://", "//") ?: str
 
-            var template = "{{< image classes=\"clear fancybox  fig-100\" src=\"$str\" thumbnail=\"$thumnailUrl\" title=\"\" >}}"
+            unsplashCaption = unsplashCaption?.replace("\n", "")
+
+            var template = "{{< image classes=\"fancybox center clear\" src=\"$str\" thumbnail=\"$thumnailUrl\" title=\"${unsplashCaption}\" >}}"
 
             val cm = applicationContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             cm.text = template
@@ -108,6 +111,7 @@ class MainActivity : AppCompatActivity() {
 
                     currentUrl = resultData["url"] as String
                     thumnailUrl = currentUrl
+                    unsplashCaption = ""
                     Glide.with(this@MainActivity).load(currentUrl).into(bi.imgPreview)
                 }
                 onErrorCallback { requestId, error ->
@@ -116,7 +120,7 @@ class MainActivity : AppCompatActivity() {
                     bi.imgPreview.visibility = View.VISIBLE
 
                     currentUrl = null
-                    thumnailUrl = null
+                    thumnailUrl = ""
 
                     Toast.makeText(this@MainActivity, error?.description, Toast.LENGTH_LONG).show()
                 }
@@ -131,8 +135,21 @@ class MainActivity : AppCompatActivity() {
                 bi.imgPreview.visibility = View.VISIBLE
 
                 currentUrl = it[0].urls.regular
-                thumnailUrl = it[0].urls.thumb
-                Glide.with(this@MainActivity).load(currentUrl).into(bi.imgPreview)
+                thumnailUrl = ""
+
+                it[0].apply {
+                    var desc = description
+                    if (desc?.length!! > 0)
+                    {
+                        desc = desc.substring(0, desc.indexOf("\n")+1)
+
+                        unsplashCaption = "\\\"$desc\\\" by ${it[0].user.name} on Unsplash.com"
+                        Glide.with(this@MainActivity).load(currentUrl).into(bi.imgPreview)
+                    }
+
+
+                }
+
             }
         }
     }
