@@ -6,7 +6,6 @@ buildscript {
         google()
         maven { url "https://jitpack.io" }
         jcenter()
-        
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.4.2'
@@ -21,7 +20,7 @@ allprojects {
         google()
         maven { url "https://jitpack.io" }
         jcenter()
-        
+        maven { url  "https://dl.bintray.com/unsplash/unsplash-photopicker-android" }
     }
 }
 
@@ -41,6 +40,14 @@ ext.loadExtraProperties = { fileName ->
 
 ext.getCloudinaryUrl = { ->
     return findProperty("cloudinaryUrl") ?: System.getenv('CLOUDINARY_URL')
+}
+
+ext.getUnsplashAccessKey = { ->
+    return findProperty("unsplashAccessKey") ?: System.getenv('UNSPLASH_ACCESS_KEY')
+}
+
+ext.getUnsplashSecretKey = { ->
+    return findProperty("unsplashSecretKey") ?: System.getenv('UNSPLASH_SECRET_KEY')
 }
 
 ext.generateAndLoadLocalGradleProperties = { rootPath ->

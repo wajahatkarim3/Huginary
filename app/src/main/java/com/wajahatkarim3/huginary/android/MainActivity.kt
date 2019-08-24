@@ -22,11 +22,12 @@ import android.content.Context.CLIPBOARD_SERVICE
 import android.text.ClipboardManager
 import android.view.View
 import androidx.core.content.ContextCompat.getSystemService
-
+import com.unsplash.pickerandroid.photopicker.presentation.UnsplashPickerActivity
 
 
 class MainActivity : AppCompatActivity() {
 
+    val RC_UNSPLASH_IMAGES = 1023
     private var currentUrl: String? = null
     lateinit var bi: ActivityMainBinding
 
@@ -73,6 +74,17 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    fun onUnsplashClick()
+    {
+        startActivityForResult(
+            UnsplashPickerActivity.getStartingIntent(
+                this, // context
+                false
+            ), RC_UNSPLASH_IMAGES
+        )
+    }
+
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == Config.RC_PICK_IMAGES && resultCode == Activity.RESULT_OK && data != null)
         {
@@ -98,6 +110,10 @@ class MainActivity : AppCompatActivity() {
                     Toast.makeText(this@MainActivity, error?.description, Toast.LENGTH_LONG).show()
                 }
             })
+        }
+        else if (requestCode == RC_UNSPLASH_IMAGES)
+        {
+
         }
     }
 }
